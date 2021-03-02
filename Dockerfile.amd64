@@ -1,0 +1,24 @@
+FROM tensorflow/tensorflow
+
+RUN apt update && \
+    apt install -y --no-install-recommends libhdf5-dev libhdf5-serial-dev libhdf5-100 \
+        libqtgui4 libqtwebkit4 libqt4-test python3-pyqt5 libatlas-base-dev libjpeg-dev \
+        libtiff5-dev libpng-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+        libxvidcore-dev libx264-dev
+
+RUN pip3 install --no-cache-dir --upgrade pip
+
+RUN pip3 install --no-cache-dir requests flask paho-mqtt pillow opencv-python
+
+RUN mkdir -p /object_detector/videos
+
+WORKDIR /object_detector
+
+COPY videos/ /object_detector/videos
+
+COPY code/ /object_detector
+
+EXPOSE 5000/tcp
+
+CMD ["python3", "object_detector_app.py", "-s", "/object_detector/videos/video.mp4"]
+
