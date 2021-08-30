@@ -52,7 +52,7 @@ def get_argument_parser():
     parser.add_argument('--threshold',            default=os.environ.get('THRESHOLD',  0.5), type=float, help='Score threshold for detected objects.')
     parser.add_argument('--history_size',         default=os.environ.get('HISTORY',      3), type=int,   help='Number of previous object detections to look at.')
     parser.add_argument('-i', '--include_labels', default=None, nargs='+',                               help='List of labels to take into account.')
-    parser.add_argument('--mqtt_broker',          default=os.environ.get('MQTT_BROKER'),                 help='MQTT Broker TCP endpoint')
+    parser.add_argument('--mqtt_brokers',         default=os.environ.get('MQTT_BROKERS'),                help='MQTT Brokers TCP endpoints (comma separated)')
     parser.add_argument('--mqtt_topic',           default=os.environ.get('MQTT_TOPIC', 'object/new'),    help='MQTT Topic')
     # TODO
     #parser.add_argument('-d', '--debug', dest='debug', help='Show debug log level (all log messages).', action='store_true', default=False)

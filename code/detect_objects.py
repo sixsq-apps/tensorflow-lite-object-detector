@@ -33,7 +33,7 @@ class ObjectDetector(object):
 
     def __init__(self, model, labels, input_source, width=None, height=None,
                  history_size=3, threshold=0.5, include_labels=None,
-                 mqtt_broker=None, mqtt_topic='default'):
+                 mqtt_brokers=None, mqtt_topic='default'):
         self._capture_lock = threading.Lock()
         self._thread_local = threading.local()
         self._thread_local.interpreter = None
@@ -69,12 +69,16 @@ class ObjectDetector(object):
         self.width  = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        self.mqtt = {}
-        if mqtt_broker:
-            mqtt_host_port = mqtt_broker.split(':')
-            self.mqtt['hostname'] = mqtt_host_port[0]
-            if len(mqtt_host_port) > 1:
-                self.mqtt['port'] = int(mqtt_host_port[1])
+        self.mqtts = []
+        if mqtt_brokers:
+            for mqtt_borker in mqtt_brokers.split('\n'):
+                mqtt_host_port = mqtt_broker.split(':')
+                mqtt = {}
+                mqtt['hostname'] = mqtt_host_port[0]
+                if len(mqtt_host_port) > 1:
+                    mqtt['port'] = int(mqtt_host_port[1])
+                self.mqtts.append(mqtt)
+
         self.mqtt_topic=mqtt_topic
 
         print('''ObjectDetector configuration:
@@ -86,7 +90,7 @@ class ObjectDetector(object):
             requested_height: {requested_height}
             output_width:  {output_width}
             output_height: {output_height}
-            mqtt:       {mqtt}
+            mqtt:       {self.mqtts}
             mqtt_topic: {mqtt_topic}'''.format(**self.__dict__))
 
     @property
@@ -169,7 +173,7 @@ class ObjectDetector(object):
         obj_ids = set(objects.keys())
         new_obj_ids = obj_ids - self.known_ids
         for obj in self.get_multi(objects, new_obj_ids).values():
-            message = "New {} (id: {})".format(self.labels[obj['class_id']], obj['id'])
+            message = '{"type": "{self.labels[obj["class_id"]]}", "id": "{obj["id"]}"}'
             print(message)
             self.mqtt_send_message(message)
             #print(f"New {self.labels[obj['class_id']]} (id: {obj['id']})")
@@ -254,12 +258,13 @@ class ObjectDetector(object):
 
     # MQTT
     def mqtt_send_message(self, message):
-        if not self.mqtt:
+        if not self.mqtts:
             return
-        try:
-            mqtt_publish.single(self.mqtt_topic, message, **self.mqtt)
-        except:
-            pass
+        for mqtt in self.mqtts:
+            try:
+                mqtt_publish.single(self.mqtt_topic, message, **mqtt)
+            except:
+                pass
 
 
 def main():

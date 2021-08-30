@@ -49,13 +49,13 @@ class VideoAnalysis(object):
 
     def __init__(self, input_source=0, quality=80, width=1280, height=720, threads=0, history_size=3,
                  model='model.tflite', labels='labels.txt', threshold=0.5, include_labels=None,
-                 mqtt_broker=None, mqtt_topic='default'):
+                 mqtt_brokers=None, mqtt_topic='default'):
         self.quality   = quality
 
         self.video_analysis = ObjectDetector(model, labels, input_source,
                                              width=width, height=height, history_size=history_size,
                                              threshold=threshold, include_labels=include_labels,
-                                             mqtt_broker=mqtt_broker, mqtt_topic=mqtt_topic)
+                                             mqtt_brokers=mqtt_brokers, mqtt_topic=mqtt_topic)
 
         self.font = cv2.FONT_HERSHEY_SIMPLEX
 
