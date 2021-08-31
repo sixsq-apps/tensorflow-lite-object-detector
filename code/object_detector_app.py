@@ -3,12 +3,14 @@
 
 import os
 import sys
+import signal
 import logging
 import argparse
 
 from flask import Flask, render_template, Response
 from video_analysis import VideoAnalysis
 
+from utils import log_threads_stackstraces
 
 app = Flask(__name__)
 parameters = dict()
@@ -37,6 +39,9 @@ def jpeg():
                     mimetype='image/jpeg',
                     direct_passthrough=True)
 
+def signal_usr1(signum, frame):
+    log_threads_stackstraces()
+
 def get_argument_parser():
     MODEL  = 'detect.tflite'
     LABELS = 'labels.txt'
@@ -62,6 +67,8 @@ def get_argument_parser():
 
 def main():
     global parameters
+
+    signal.signal(signal.SIGUSR1, signal_usr1)
 
     argument_parser = get_argument_parser()
     args = argument_parser.parse_args()
