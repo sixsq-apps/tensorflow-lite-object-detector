@@ -73,14 +73,17 @@ class ObjectDetector(object):
 
         self.mqtts = []
         if mqtt_brokers:
-            for mqtt_broker in mqtt_brokers.split('\n'):
+            for mqtt_broker in mqtt_brokers.split(','):
                 if mqtt_broker:
-                    mqtt_host_port = mqtt_broker.split(':')
-                    mqtt = {}
-                    mqtt['hostname'] = mqtt_host_port[0]
-                    if len(mqtt_host_port) > 1:
-                        mqtt['port'] = int(mqtt_host_port[1])
-                    self.mqtts.append(mqtt)
+                    try:
+                        mqtt_host_port = mqtt_broker.split(':')
+                        mqtt = {}
+                        mqtt['hostname'] = mqtt_host_port[0]
+                        if len(mqtt_host_port) > 1:
+                            mqtt['port'] = int(mqtt_host_port[1])
+                        self.mqtts.append(mqtt)
+                    except Exception as e:
+                        logger.exception('Failed to parse MQTT broker: {mqtt_broker}')
 
         self.mqtt_topic=mqtt_topic
 
