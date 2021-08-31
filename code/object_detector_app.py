@@ -72,7 +72,7 @@ def main():
     logging.basicConfig(level=log_level)
 
     args_list = '\n'.join(['{}: {}'.format(k, v) for k,v in parameters.items()])
-    logging.info('Arguments: \n{args_list}')
+    logging.info(f'Arguments: \n{args_list}')
 
     app.run(host='0.0.0.0', debug=False, threaded=True)
 

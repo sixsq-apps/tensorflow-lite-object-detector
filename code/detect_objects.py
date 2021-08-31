@@ -7,6 +7,7 @@ from __future__ import division
 from __future__ import print_function
 
 import re
+import json
 import copy
 import time
 import logging
@@ -72,13 +73,14 @@ class ObjectDetector(object):
 
         self.mqtts = []
         if mqtt_brokers:
-            for mqtt_borker in mqtt_brokers.split('\n'):
-                mqtt_host_port = mqtt_broker.split(':')
-                mqtt = {}
-                mqtt['hostname'] = mqtt_host_port[0]
-                if len(mqtt_host_port) > 1:
-                    mqtt['port'] = int(mqtt_host_port[1])
-                self.mqtts.append(mqtt)
+            for mqtt_broker in mqtt_brokers.split('\n'):
+                if mqtt_broker:
+                    mqtt_host_port = mqtt_broker.split(':')
+                    mqtt = {}
+                    mqtt['hostname'] = mqtt_host_port[0]
+                    if len(mqtt_host_port) > 1:
+                        mqtt['port'] = int(mqtt_host_port[1])
+                    self.mqtts.append(mqtt)
 
         self.mqtt_topic=mqtt_topic
 
@@ -174,7 +176,12 @@ class ObjectDetector(object):
         obj_ids = set(objects.keys())
         new_obj_ids = obj_ids - self.known_ids
         for obj in self.get_multi(objects, new_obj_ids).values():
-            message = '{"type": "{self.labels[obj["class_id"]]}", "id": "{obj["id"]}"}'
+            data = {
+                "id"   : obj["id"],
+                "type" : self.labels[obj["class_id"]],
+                "score": obj['score']
+            }
+            message = json.dumps(data)
             logging.info(message)
             self.mqtt_send_message(message)
             #logging.info(f"New {self.labels[obj['class_id']]} (id: {obj['id']})")
