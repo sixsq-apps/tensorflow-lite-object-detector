@@ -182,7 +182,7 @@ class ObjectDetector(object):
             data = {
                 "id"   : obj["id"],
                 "type" : self.labels[obj["class_id"]],
-                "score": obj['score']
+                "score": obj['score'].item()
             }
             message = json.dumps(data)
             logging.info(message)
