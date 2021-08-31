@@ -96,7 +96,7 @@ class ObjectDetector(object):
             requested_height: {requested_height}
             output_width:  {output_width}
             output_height: {output_height}
-            mqtt:       {self.mqtts}
+            mqtt:       {mqtts}
             mqtt_topic: {mqtt_topic}'''.format(**self.__dict__))
 
     @property
