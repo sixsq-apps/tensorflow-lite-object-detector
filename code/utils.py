@@ -1,8 +1,10 @@
 # coding:utf-8
 
+import sys
 import queue
 import weakref
 import threading
+import faulthandler
 
 
 class Singleton(type):
