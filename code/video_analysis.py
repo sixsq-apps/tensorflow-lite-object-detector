@@ -5,6 +5,7 @@ import os
 import cv2
 import time
 import utils
+import logging
 import threading
 import collections
 import requests

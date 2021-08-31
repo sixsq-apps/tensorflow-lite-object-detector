@@ -3,6 +3,7 @@
 
 import os
 import sys
+import logging
 import argparse
 
 from flask import Flask, render_template, Response
@@ -55,7 +56,7 @@ def get_argument_parser():
     parser.add_argument('--mqtt_brokers',         default=os.environ.get('MQTT_BROKERS'),                help='MQTT Brokers TCP endpoints (comma separated)')
     parser.add_argument('--mqtt_topic',           default=os.environ.get('MQTT_TOPIC', 'object/new'),    help='MQTT Topic')
     # TODO
-    #parser.add_argument('-d', '--debug', dest='debug', help='Show debug log level (all log messages).', action='store_true', default=False)
+    parser.add_argument('-d', '--debug', dest='debug', help='Show debug log level (all log messages).', action='store_true', default=False)
     #parser.add_argument('-q', '--quiet', dest='quiet', help='Show less log messages. Add more to get less details.', action='count', default=0)
     return parser
 
@@ -65,8 +66,13 @@ def main():
     argument_parser = get_argument_parser()
     args = argument_parser.parse_args()
     parameters = dict(args._get_kwargs())
-    for k,v in parameters.items():
-        print('{}: {}'.format(k, v))
+    del parameters['debug']
+
+    log_level = logging.DEBUG if args.debug else logging.INFO
+    logging.basicConfig(level=log_level)
+
+    args_list = '\n'.join(['{}: {}'.format(k, v) for k,v in parameters.items()])
+    logging.info('Arguments: \n{args_list}')
 
     app.run(host='0.0.0.0', debug=False, threaded=True)
 

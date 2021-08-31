@@ -9,6 +9,7 @@ from __future__ import print_function
 import re
 import copy
 import time
+import logging
 import threading
 
 import cv2
@@ -81,7 +82,7 @@ class ObjectDetector(object):
 
         self.mqtt_topic=mqtt_topic
 
-        print('''ObjectDetector configuration:
+        logging.info('''ObjectDetector configuration:
             input_source: {input_source}
             fps: {fps}
             width:  {width}
@@ -99,7 +100,7 @@ class ObjectDetector(object):
             self._thread_local.interpreter = tflite.Interpreter(self.model)
             self._thread_local.interpreter.allocate_tensors()
             _, self.input_height, self.input_width, _ = self._thread_local.interpreter.get_input_details()[0]['shape']
-            print('''
+            logging.info('''
             input_width:  {}
             input_height: {}
            '''.format(self.input_height, self.input_width))
@@ -174,9 +175,9 @@ class ObjectDetector(object):
         new_obj_ids = obj_ids - self.known_ids
         for obj in self.get_multi(objects, new_obj_ids).values():
             message = '{"type": "{self.labels[obj["class_id"]]}", "id": "{obj["id"]}"}'
-            print(message)
+            logging.info(message)
             self.mqtt_send_message(message)
-            #print(f"New {self.labels[obj['class_id']]} (id: {obj['id']})")
+            #logging.info(f"New {self.labels[obj['class_id']]} (id: {obj['id']})")
         self.known_ids |= obj_ids
 
         return results
